@@ -6,7 +6,8 @@
   "types": "lib/index.d.ts",
   "scripts": {
     "clean": "node ./scripts/clean.mjs",
-    "build": "npm run clean && rollup -c --bundleConfigAsCjs"
+    "build": "npm run clean && rollup -c --bundleConfigAsCjs",
+    "test": "npm run build && node ./test/index.cjs"
   },
   "files": [
     "lib"

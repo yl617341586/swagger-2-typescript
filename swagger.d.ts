@@ -36,7 +36,9 @@ export interface PropertiesItem {
   type?: Type;
   format?: string;
   description?: string;
-  items?: SwaggerRef;
+  minLength?: number;
+  maxLength?: number;
+  items?: SwaggerRef & { type?: Type; enum?: Array<string | number | boolean> };
 }
 export interface SwaggerRef {
   $ref?: string;

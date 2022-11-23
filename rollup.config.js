@@ -10,7 +10,7 @@ export default {
       sourcemap: false,
     },
     {
-      file: 'lib/index.es.js',
+      file: 'lib/es/index.js',
       format: 'es',
       sourcemap: false,
     },
