@@ -4,7 +4,7 @@ import { writeFileSync } from 'fs';
 import { cwd } from 'process';
 import { resolve } from 'path';
 export default (json: Swagger, output?: string) => {
-  writeFileSync(resolve(output ? output : cwd(), 'type.d.ts'), generateType(json), {
+  writeFileSync(resolve(output ? output : cwd(), 'type.ts'), generateType(json), {
     encoding: 'utf-8',
   });
 };

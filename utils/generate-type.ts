@@ -1,7 +1,7 @@
 import { DefinitionsItem, PropertiesItem, Swagger, SwaggerRef } from '../swagger';
 const checkIsRefType = (items: PropertiesItem['items']): boolean =>
   Object.prototype.hasOwnProperty.call(items, 'originalRef');
-const checkIsEnumType = (items: PropertiesItem['items']): boolean =>
+const checkIsEnumType = (items: PropertiesItem['items'] | PropertiesItem): boolean =>
   Object.prototype.hasOwnProperty.call(items, 'enum');
 const generateArrayType = (items: PropertiesItem['items']) => {
   if (checkIsRefType(items)) return `Array<${items?.originalRef?.replace(/\«|\»/g, '')}>`;
@@ -11,15 +11,36 @@ const generateArrayType = (items: PropertiesItem['items']) => {
   }
   return `Array<${items?.type}>`;
 };
+const generateStrType = (item: PropertiesItem) => {
+  if (checkIsEnumType(item)) {
+    const arrStr = JSON.stringify(item?.enum).replace(/,/g, ' | ');
+    return String(arrStr.substring(1, arrStr.length - 1));
+  }
+  return item?.type;
+};
+const generateNumberType = (item: PropertiesItem) => {
+  if (checkIsEnumType(item)) {
+    const arrStr = JSON.stringify(item?.enum).replace(/,/g, ' | ');
+    return String(arrStr.substring(1, arrStr.length - 1));
+  }
+  return 'number';
+};
+const generateBooleanType = (item: PropertiesItem) => {
+  if (checkIsEnumType(item)) {
+    const arrStr = JSON.stringify(item?.enum).replace(/,/g, ' | ');
+    return String(arrStr.substring(1, arrStr.length - 1));
+  }
+  return item?.type;
+};
 const handleAttributes = (item: PropertiesItem & SwaggerRef) => {
   if (item.type)
     switch (item.type) {
       case 'string':
-        return 'string';
+        return generateStrType(item);
       case 'boolean':
-        return 'boolean';
+        return generateBooleanType(item);
       case 'integer':
-        return 'number';
+        return generateNumberType(item);
       case 'array':
         return generateArrayType(item.items);
     }
