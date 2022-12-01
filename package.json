@@ -1,5 +1,5 @@
 {
-  "name": "swagger-2-typescript",
+  "name": "swagger-2-ts-file",
   "version": "1.0.0",
   "description": "swagger json to ts file",
   "main": "lib/index.js",
@@ -16,7 +16,10 @@
     "type": "git",
     "url": "git+https://github.com/yl617341586/swagger-2-typescript.git"
   },
-  "keywords": [],
+  "keywords": [
+    "swagger",
+    "typescript"
+  ],
   "author": "",
   "license": "ISC",
   "bugs": {
