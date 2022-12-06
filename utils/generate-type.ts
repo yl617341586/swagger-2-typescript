@@ -49,6 +49,8 @@ const handleAttributes = (item: PropertiesItem & SwaggerRef, key: string) => {
         return generateBooleanType(item);
       case 'integer':
         return generateNumberType(item);
+      case 'number':
+        return generateNumberType(item);
       case 'array':
         return generateArrayType(item.items);
     }

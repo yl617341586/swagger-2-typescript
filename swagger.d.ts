@@ -1,4 +1,4 @@
-export type Type = 'object' | 'string' | 'array' | 'integer' | 'boolean';
+export type Type = 'object' | 'string' | 'array' | 'integer' | 'boolean' | 'number';
 export interface Swagger {
   swagger: string;
   info: Info;
