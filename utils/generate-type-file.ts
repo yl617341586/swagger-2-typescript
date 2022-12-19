@@ -4,7 +4,9 @@ import { writeFileSync } from 'fs';
 import { cwd } from 'process';
 import { resolve } from 'path';
 export default (json: Swagger, output?: string) => {
-  writeFileSync(output ? resolve(output) : resolve(cwd(), 'type.ts'), generateType(json), {
+  const path = output ? resolve(output) : resolve(cwd(), 'type.ts');
+  writeFileSync(path, generateType(json), {
     encoding: 'utf-8',
   });
+  console.log(`[Swagger2TSFile] => 文件生成路路径 ${path}`);
 };
