@@ -1,86 +1,72 @@
 import type { DefinitionsItem, PropertiesItem, Swagger, SwaggerRef } from '../swagger';
-const checkIsRefType = (items: PropertiesItem['items']): boolean =>
-  Object.prototype.hasOwnProperty.call(items, 'originalRef') ||
-  Object.prototype.hasOwnProperty.call(items, '$ref');
-const checkIsEnumType = (items: PropertiesItem['items'] | PropertiesItem): boolean =>
-  Object.prototype.hasOwnProperty.call(items, 'enum');
-const generateArrayType = (items: PropertiesItem['items']) => {
-  if (checkIsRefType(items)) {
-    return `Array<${generateRefType(items as SwaggerRef)}>`;
-  } else if (checkIsEnumType(items)) {
-    const arrStr = JSON.stringify(items?.enum).replace(/,/g, ' | ');
-    return `Array<${arrStr.substring(1, arrStr.length - 1)}>`;
-  }
-  return `Array<${items?.type}>`;
-};
-const generateStrType = (item: PropertiesItem, key: string) => {
-  if (checkIsEnumType(item)) {
-    const arrStr = JSON.stringify(item?.enum).replace(/,/g, ' | ');
-    const enumItem = String(arrStr.substring(1, arrStr.length - 1));
-    return enumItem;
-  }
-  return item?.type;
-};
-const generateNumberType = (item: PropertiesItem) => {
-  if (checkIsEnumType(item)) {
-    const arrStr = JSON.stringify(item?.enum).replace(/,/g, ' | ');
-    return String(arrStr.substring(1, arrStr.length - 1));
-  }
-  return 'number';
-};
-const generateBooleanType = (item: PropertiesItem) => {
-  if (checkIsEnumType(item)) {
-    const arrStr = JSON.stringify(item?.enum).replace(/,/g, ' | ');
-    return String(arrStr.substring(1, arrStr.length - 1));
-  }
-  return item?.type;
+import { checkIsEnumType, checkIsRefType } from './type-check';
+const enumTypes: Array<string> = [];
+const generateEnumType = (item: PropertiesItem) => {
+  const arrStr = JSON.stringify(item?.enum).replace(/,/g, ' | ');
+  return String(arrStr.substring(1, arrStr.length - 1));
 };
 const generateRefType = (item: SwaggerRef) => {
-  if (item.originalRef) return item.originalRef?.replace(/\«|\»/g, '');
-  else if (item.$ref)
-    return item.$ref?.substring(item.$ref.lastIndexOf('/') + 1).replace(/\«|\»/g, '');
+  const ref = (
+    (Object.prototype.hasOwnProperty.call(item, 'originalRef')
+      ? item.originalRef
+      : item.$ref?.substring(item.$ref.lastIndexOf('/') + 1)) ?? ''
+  ).replace(/\«|\»/g, '');
+  return /^\w+$/g.test(ref) ? ref : 'unknown';
 };
-const handleAttributes = (item: PropertiesItem & SwaggerRef, key: string) => {
-  if (item.type)
-    switch (item.type) {
-      case 'string':
-        return generateStrType(item, key);
-      case 'boolean':
-        return generateBooleanType(item);
-      case 'integer':
-        return generateNumberType(item);
-      case 'number':
-        return generateNumberType(item);
-      case 'array':
-        return generateArrayType(item.items);
-    }
-  else if (checkIsRefType(item)) return generateRefType(item);
+const handleAttributes = (
+  item: PropertiesItem & SwaggerRef,
+  interfaceName: string,
+  _key: string,
+): string => {
+  if (checkIsRefType(item)) return generateRefType(item);
+  if (checkIsEnumType(item)) {
+    const typeName = `Enum${interfaceName.replace(
+      /\w/,
+      (interfaceName.match(/\w/)?.[0] ?? '').toLocaleUpperCase(),
+    )}${_key.replace(/\w/, (_key.match(/\w/)?.[0] ?? '').toLocaleUpperCase())}`;
+    const enumType = `export type ${typeName} = ${generateEnumType(item)}`;
+    if (!enumTypes.includes(enumType)) enumTypes.push(enumType);
+    return typeName;
+  }
+  switch (item.type) {
+    case 'integer':
+      return 'number';
+    case 'array':
+      return `Array<${handleAttributes(
+        item.items as PropertiesItem & SwaggerRef,
+        interfaceName,
+        _key,
+      )}>`;
+    default:
+      return item?.type ?? 'string';
+  }
 };
 
 const handleItem = (key: string, item: DefinitionsItem) => {
+  const interfaceName = key.replace(/\«|\»/g, '');
+  if (!/^\w+$/g.test(interfaceName))
+    return console.log(
+      `[Swagger2TSFile] => 接口名只能由字母数字下划线组成 错误名称：${interfaceName}`,
+    );
   return `
-  export interface ${key.replace(/\«|\»/g, '')} {
-  ${Object.keys(item.properties)
-    .map(
-      inlineKey => `${
-        item.properties[inlineKey].description
-          ? `/**${item.properties[inlineKey].description} ${
-              item.properties[inlineKey].maxLength
-                ? `minLength: ${item.properties[inlineKey].minLength}`
-                : ''
-            } ${
-              item.properties[inlineKey].maxLength
-                ? `maxLength: ${item.properties[inlineKey].maxLength}`
-                : ''
-            } */`
-          : ''
-      }
-      ${inlineKey}: ${handleAttributes(item.properties[inlineKey], inlineKey)};
-      `,
-    )
-    .join('')}
+  export interface ${interfaceName.replace(
+    /\w/,
+    (interfaceName.match(/\w/)?.[0] ?? '').toLocaleUpperCase(),
+  )} {
+      ${Object.keys(item.properties)
+        .map(_key => {
+          const description = item.properties[_key].description;
+          const minLength = item.properties[_key]?.minLength;
+          const maxLength = item.properties[_key]?.maxLength;
+          return `/**${`${description ?? ''} ${minLength ? `minLength: ${minLength}` : ''} ${
+            maxLength ? `maxLength: ${maxLength}` : ''
+          } */`}
+      ${_key}: ${handleAttributes(item.properties[_key], interfaceName, _key)};
+      `;
+        })
+        .join('')}
     }
-  `;
+`;
 };
 
 export default (json: Swagger) => {
@@ -89,5 +75,6 @@ export default (json: Swagger) => {
     const item = json.definitions[key];
     typeData += handleItem(key, item);
   }
+  typeData += enumTypes.join(';\n');
   return typeData;
 };
