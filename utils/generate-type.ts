@@ -70,7 +70,7 @@ const handleItem = (key: string, item: DefinitionsItem) => {
 };
 
 export default (json: Swagger) => {
-  const refs = Array.from(new Set(JSON.stringify(json).match(/(?<="#\/)(.+?)(?=\/.+")/g)));
+  const refs = Array.from(new Set(JSON.stringify(json).match(/(?<="#\/)(.+?)(?=\/(.[^/])+")/g)));
   try {
     let typeData = '';
     refs.forEach(path => {
@@ -83,7 +83,7 @@ export default (json: Swagger) => {
     });
     return typeData;
   } catch (e: any) {
-    console.log(`[Swagger2TSFile]: ${e.message}`);
+    console.log(`[Swagger2TSFile]: ${e}`);
     return '';
   }
 };
