@@ -70,13 +70,17 @@ const handleItem = (key: string, item: DefinitionsItem) => {
 };
 
 export default (json: Swagger) => {
+  const refs = Array.from(new Set(JSON.stringify(json).match(/(?<="#\/)(.+?)(?=\/.+")/g)));
   try {
     let typeData = '';
-    for (const key in json.definitions) {
-      const item = json.definitions[key];
-      typeData += handleItem(key, item);
-    }
-    typeData += enumTypes.join(';\n');
+    refs.forEach(path => {
+      const ref = eval(`json.${path.replace('/', '.')}`);
+      for (const key in ref) {
+        const item = ref[key];
+        typeData += handleItem(key, item);
+      }
+      typeData += enumTypes.join(';\n');
+    });
     return typeData;
   } catch (e: any) {
     console.log(`[Swagger2TSFile]: ${e.message}`);

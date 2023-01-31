@@ -6,8 +6,8 @@ export interface Swagger {
   basePath: string;
   tags: any[];
   paths: Path;
-  // securityDefinitions: SecurityDefinition;
   definitions: Definition;
+  [x: string]: any;
 }
 
 export interface License {
