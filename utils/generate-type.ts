@@ -45,9 +45,9 @@ const handleAttributes = (
 const handleItem = (key: string, item: DefinitionsItem) => {
   const interfaceName = key.replace(/\«|\»/g, '');
   if (!/^\w+$/g.test(interfaceName))
-    return console.log(
-      `[Swagger2TSFile] => 接口名只能由字母数字下划线组成 错误名称：${interfaceName}`,
-    );
+    throw new Error(`接口名只能由字母数字下划线组成 错误名称：${key}
+    ${JSON.stringify(item.properties)}
+    `);
   return `
   export interface ${interfaceName.replace(
     /\w/,
@@ -70,11 +70,16 @@ const handleItem = (key: string, item: DefinitionsItem) => {
 };
 
 export default (json: Swagger) => {
-  let typeData = '';
-  for (const key in json.definitions) {
-    const item = json.definitions[key];
-    typeData += handleItem(key, item);
+  try {
+    let typeData = '';
+    for (const key in json.definitions) {
+      const item = json.definitions[key];
+      typeData += handleItem(key, item);
+    }
+    typeData += enumTypes.join(';\n');
+    return typeData;
+  } catch (e: any) {
+    console.log(`[Swagger2TSFile]: ${e.message}`);
+    return '';
   }
-  typeData += enumTypes.join(';\n');
-  return typeData;
 };

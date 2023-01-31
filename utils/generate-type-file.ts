@@ -11,18 +11,24 @@ export default (json: Swagger, output?: string) => {
         const _path = `${path.substring(0, path.indexOf(`/${name}`))}/${name}`;
         access(_path, constants.F_OK, err => {
           if (err && _path === path) {
-            writeFileSync(path, generateType(json), {
-              encoding: 'utf-8',
-            });
-            console.log(`[Swagger2TSFile] => 文件生成路路径 ${path}`);
+            const data = generateType(json);
+            if (data) {
+              writeFileSync(path, generateType(json), {
+                encoding: 'utf-8',
+              });
+              console.log(`[Swagger2TSFile]: 文件生成路路径 ${path}`);
+            }
           } else if (err) mkdirSync(_path);
         });
       });
     } else {
-      writeFileSync(path, generateType(json), {
-        encoding: 'utf-8',
-      });
-      console.log(`[Swagger2TSFile] => 文件生成路路径 ${path}`);
+      const data = generateType(json);
+      if (data) {
+        writeFileSync(path, generateType(json), {
+          encoding: 'utf-8',
+        });
+        console.log(`[Swagger2TSFile]: 文件生成路路径 ${path}`);
+      }
     }
   });
 };
