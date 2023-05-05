@@ -61,7 +61,11 @@ const handleItem = (key: string, item: DefinitionsItem) => {
           return `/**${`${description ?? ''} ${minLength ? `minLength: ${minLength}` : ''} ${
             maxLength ? `maxLength: ${maxLength}` : ''
           } */`}
-      ${_key}: ${handleAttributes(item.properties[_key], interfaceName, _key)};
+      ${_key}${item.required?.includes(_key) ? '' : '?'}: ${handleAttributes(
+            item.properties[_key],
+            interfaceName,
+            _key,
+          )};
       `;
         })
         .join('')}
