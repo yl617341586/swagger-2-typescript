@@ -3,6 +3,7 @@ name: 错误报告
 about: 创建错误报告以帮助我改进
 title: "[BUG] XXXXXX"
 labels: bug
+assignees 'yl617341586'
 ---
 
 **描述错误**
