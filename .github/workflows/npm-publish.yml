@@ -13,32 +13,35 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+
       - uses: actions/setup-node@v3
         with:
           node-version: 16
+
       - run: npm i
+
       - run: npm run build
-      - name: Upload output file
-        uses: actions/upload-artifact@v3
+
+      - uses: actions/upload-artifact@v3
         with:
           name: output
-          path: ./lib
+          path: lib
 
   publish-npm:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - name: Download a single artifact
-        uses: actions/download-artifact@v3
-        with:
-          name: output
-
       - uses: actions/checkout@v3
 
       - uses: actions/setup-node@v3
         with:
           node-version: 16
           registry-url: https://registry.npmjs.org/
+
+      - name: Download a single artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: output
 
       - run: ls -R
 #      - run: npm publish
