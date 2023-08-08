@@ -18,6 +18,9 @@ jobs:
 
       - name: 打包应用
         run: npm run build
+        
+      - name: Print NPM_TOKEN
+        run: echo ${{ secrets.NPM_TOKEN }}
 
       - name: 发布到npm
         run: npm publish
