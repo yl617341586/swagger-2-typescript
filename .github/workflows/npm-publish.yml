@@ -1,8 +1,6 @@
-name: npm-publish
+name: Node.js Package
 
 on:
-  release:
-    types: [created]
   push:
     branches:
       - main
@@ -11,28 +9,18 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
         with:
           node-version: 16
-          
-      - name: Install dependencies
-        run: npm install
-
-      - name: Build package
-        run: npm run build
-
-      - name: List build files
-        run: ls -R
-        
+      - run: npm i
+      - run: npm run build
 
   publish-npm:
     needs: build
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
           node-version: 16
