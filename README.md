@@ -22,7 +22,7 @@ generateTypeFile(swaggerJson);
 
 ### Issues
 
-点击[这里](https://github.com/yl617341586/swagger-2-typescript/issues/new)提交一个issues，帮助我完善此包。每一个issues我都会认真阅读并切回复。
+点击[这里](https://github.com/yl617341586/swagger-2-typescript/issues/new/choose)提交一个issues，帮助我完善此包。每一个issues我都会认真阅读并切回复。
 
 ### License
 
