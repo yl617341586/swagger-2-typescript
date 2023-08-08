@@ -17,9 +17,7 @@ export default {
   ],
   plugins: [
     typescript(),
-    copy({
-      targets: [{ src: 'swagger.d.ts', dest: 'lib' }],
-    }),
+    copy({ targets: [{ src: 'openapi.d.ts', dest: 'lib' }] }),
     getBabelOutputPlugin(),
   ],
 };
