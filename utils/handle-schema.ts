@@ -1,4 +1,4 @@
-import { openapiTypeFormat } from '.';
+import openapiTypeFormat from './openapi-type-format';
 import { Schema } from '../openapi';
 import handleRef from './handle-ref';
 export default () => {

@@ -1,7 +1,7 @@
-import generateType from './generate-type';
-import { writeFileSync, access, constants, mkdirSync, accessSync } from 'fs';
+import { writeFileSync, constants, accessSync } from 'fs';
 import { cwd } from 'process';
 import { resolve } from 'path';
+import generateType from './generate-type';
 import { OpenApi } from '../openapi';
 export default async (json: OpenApi, output = resolve(cwd(), 'type.ts')) => {
   const data = await generateType(json);
