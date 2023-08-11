@@ -1,5 +1,5 @@
 # swagger-2-typescript &middot; [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/yl617341586/swagger-2-typescript/blob/main/LICENSE) [![npm version](https://img.shields.io/npm/v/swagger-2-ts-file.svg?style=flat)](https://www.npmjs.com/package/swagger-2-ts-file)
-swagger-2-typescript是一个将swagger json 转译成Typescript类型的库
+swagger-2-typescript是一个将swagger json 转译成Typescript类型的库，支持同时支持es和cjs
 
 - 多样性：swagger-2-typescript分别提供了生成文件和生成数据的方法，可以自由的操作转译的数据。
 - 时效性：支持openapi 3.0.x，后续根据版本更新。
@@ -13,6 +13,8 @@ swagger-2-typescript是一个将swagger json 转译成Typescript类型的库
 
 ```javascript
 const { generateTypeFile, generateType } = require('swagger-2-ts-file');
+// import { generateTypeFile } from 'swagger-2-ts-file';
+
 // 通过远程获取或者本地导入均可，只要是满足openapi 3.0.x规范的json对象即可。
 generateTypeFile(swaggerJson);
 
