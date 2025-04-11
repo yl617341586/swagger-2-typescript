@@ -7,6 +7,7 @@
   "scripts": {
     "clean": "node ./scripts/clean.mjs",
     "build": "npm run clean && rollup -c --bundleConfigAsCjs",
+    "lint": "eslint",
     "test": "npm run build && node ./test/index.cjs"
   },
   "files": [
@@ -30,21 +31,24 @@
   "homepage": "https://github.com/yl617341586/swagger-2-typescript#readme",
   "devDependencies": {
     "@babel/core": "^7.20.2",
-    "@babel/plugin-proposal-nullish-coalescing-operator": "^7.18.6",
-    "@babel/plugin-proposal-optional-chaining": "^7.18.9",
+    "@babel/plugin-transform-nullish-coalescing-operator": "^7.26.6",
+    "@babel/plugin-transform-optional-chaining": "^7.25.9",
     "@babel/preset-env": "^7.20.2",
+    "@eslint/js": "^9.24.0",
     "@rollup/plugin-babel": "^6.0.2",
     "@rollup/plugin-node-resolve": "^15.1.0",
-    "@typescript-eslint/eslint-plugin": "^5.44.0",
-    "@typescript-eslint/parser": "^5.44.0",
-    "eslint": "^8.28.0",
-    "eslint-config-prettier": "^8.5.0",
-    "eslint-plugin-import": "^2.26.0",
-    "eslint-plugin-prettier": "^4.2.1",
+    "@types/node": "^22.14.0",
+    "@typescript-eslint/eslint-plugin": "^8.29.1",
+    "@typescript-eslint/parser": "^8.29.1",
+    "eslint": "^9.24.0",
+    "eslint-config-prettier": "^10.1.2",
+    "eslint-plugin-import": "^2.31.0",
+    "eslint-plugin-prettier": "^5.2.6",
+    "globals": "^16.0.0",
     "prettier": "^2.7.1",
     "rollup": "^3.4.0",
     "rollup-plugin-copy": "^3.4.0",
     "rollup-plugin-typescript2": "^0.34.1",
-    "typescript": "^4.9.3"
+    "typescript": "^5.8.3"
   }
 }
