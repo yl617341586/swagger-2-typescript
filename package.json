@@ -13,6 +13,7 @@
   "files": [
     "lib"
   ],
+  "type": "module",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/yl617341586/swagger-2-typescript.git"
@@ -38,17 +39,18 @@
     "@rollup/plugin-babel": "^6.0.2",
     "@rollup/plugin-node-resolve": "^15.1.0",
     "@types/node": "^22.14.0",
-    "@typescript-eslint/eslint-plugin": "^8.29.1",
-    "@typescript-eslint/parser": "^8.29.1",
+    "@typescript-eslint/parser": "^8.30.1",
     "eslint": "^9.24.0",
     "eslint-config-prettier": "^10.1.2",
-    "eslint-plugin-import": "^2.31.0",
+    "eslint-import-resolver-typescript": "^4.3.2",
+    "eslint-plugin-import-x": "^4.10.3",
     "eslint-plugin-prettier": "^5.2.6",
     "globals": "^16.0.0",
-    "prettier": "^2.7.1",
+    "prettier": "^3.5.3",
     "rollup": "^3.4.0",
     "rollup-plugin-copy": "^3.4.0",
     "rollup-plugin-typescript2": "^0.34.1",
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "typescript-eslint": "^8.30.1"
   }
 }

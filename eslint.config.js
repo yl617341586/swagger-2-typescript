@@ -1,42 +1,25 @@
-const js = require('@eslint/js');
-const typescriptEslintParser = require('@typescript-eslint/parser');
-const typescriptEslintPlugin = require('@typescript-eslint/eslint-plugin');
-const importPlugin = require('eslint-plugin-import');
-const prettierConfig = require('eslint-config-prettier');
-const prettierPlugin = require('eslint-plugin-prettier');
-
+import js from '@eslint/js';
+import { configs } from 'typescript-eslint';
+import * as pluginImportX from 'eslint-plugin-import-x';
+import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
 /**
  * @type {import('eslint').Linter.Config}
  */
 const config = [
   {
-    ignores: ['lib/**', 'node_modules/**', 'example/**'],
+    files: ['**/*.ts'],
+  },
+  {
+    ignores: ['lib/**', 'node_modules/**'],
+  },
+  {
+    rules: {},
   },
   js.configs.recommended,
-  importPlugin.flatConfigs.recommended,
-  prettierConfig,
-  {
-    languageOptions: {
-      ecmaVersion: 2024,
-      sourceType: 'module',
-      globals: {
-        ...require('globals').node,
-      },
-      parser: typescriptEslintParser,
-    },
-    plugins: {
-      typescript: typescriptEslintPlugin,
-      prettier: prettierPlugin,
-    },
-    // rules: {
-    //   'import/no-unresolved': 0,
-    //   'import/export': 0,
-    //   '@typescript-eslint/no-var-requires': 0,
-    //   '@typescript-eslint/no-empty-function': 0,
-    //   '@typescript-eslint/no-unused-vars': 0,
-    //   '@typescript-eslint/no-explicit-any': 0,
-    //   '@typescript-eslint/no-non-null-assertion': 0,
-    // },
-  },
+  ...configs.recommended,
+  pluginImportX.flatConfigs.recommended,
+  pluginImportX.flatConfigs.typescript,
+  eslintPluginPrettierRecommended,
 ];
-module.exports = config;
+
+export default config;
