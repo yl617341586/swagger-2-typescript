@@ -106,4 +106,5 @@ dist
 .DS_Store
 lib
 type.ts
-test/swagger.json
+
+.vscode/**
