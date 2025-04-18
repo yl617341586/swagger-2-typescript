@@ -6,13 +6,13 @@
  */
 
 import { OpenAPIV3 as OA3 } from 'openapi-types';
-import { handleSchema, handleRef, openapiTypeFormat } from '.';
+import { handleSchema, openapiTypeFormat } from '.';
 export default (schema: OA3.SchemaObject): string => {
   const baseStr: string[] = [];
   Object.entries(schema).forEach(([key, property]) => {
-    const { isRef, comment } = handleSchema(property);
+    const { isRef, comment, refName } = handleSchema(property);
     baseStr.push(comment);
-    baseStr.push(`${key}: ${isRef ? handleRef(property).name : openapiTypeFormat(property)};\n`);
+    baseStr.push(`${key}: ${isRef ? refName : openapiTypeFormat(property)};\n`);
   });
   return baseStr.join('');
 };

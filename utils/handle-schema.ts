@@ -1,7 +1,7 @@
 import { OpenAPIV3 as OA3 } from 'openapi-types';
-import { handleRef } from '.';
+import handleRef from './handle-ref';
 export default (schema: OA3.SchemaObject | OA3.ReferenceObject) => {
-  const { isRef } = handleRef(schema);
+  const { isRef, name: refName } = handleRef(schema);
   const generateComment = (schema: OA3.SchemaObject): string => {
     const comments: string[] = [];
     const allowList: (keyof OA3.SchemaObject)[] = ['description', 'format'];
@@ -13,10 +13,13 @@ export default (schema: OA3.SchemaObject | OA3.ReferenceObject) => {
     });
     return comments.length ? `/**\n ${comments.join('')} */\n` : '';
   };
-  const isAllOf = Object.prototype.hasOwnProperty.call(schema, 'allOf');
+  const hasAllOf = Object.prototype.hasOwnProperty.call(schema, 'allOf');
+  const isArray = Object.prototype.hasOwnProperty.call(schema, 'items');
   return {
     isRef,
+    isArray,
+    refName,
     comment: isRef ? '' : generateComment(<OA3.SchemaObject>schema),
-    isAllOf,
+    hasAllOf,
   };
 };
