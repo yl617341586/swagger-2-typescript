@@ -5,7 +5,7 @@
  * @description: generate export string
  */
 import { OpenAPIV3 as OA3 } from 'openapi-types';
-import { openapiTypeFormat, handleSchema } from '.';
+import { openapiTypeFormat } from '.';
 export default (isRoot: boolean) => {
   const ref = (key: string, name: string, depth: number) => {
     return isRoot ? `export type ${key} = ${name};\n` : `${'  '.repeat(depth)}${key}: ${name}\n`;
