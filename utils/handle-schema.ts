@@ -15,6 +15,7 @@ export default (schema: OA3.SchemaObject | OA3.ReferenceObject) => {
   };
   const hasAllOf = Object.prototype.hasOwnProperty.call(schema, 'allOf');
   const isArray = Object.prototype.hasOwnProperty.call(schema, 'items');
+
   return {
     isRef,
     isArray,

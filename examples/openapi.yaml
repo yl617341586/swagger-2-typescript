@@ -33,6 +33,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UserListResponse'
+        '400':
+          description: 成功返回用户列表
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserListResponse'
     post:
       summary: 创建新用户
       description: 创建一个新用户，需要提供姓名和邮箱

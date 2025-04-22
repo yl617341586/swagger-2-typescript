@@ -6,7 +6,13 @@
  */
 import { OpenAPIV3 as OA3 } from 'openapi-types';
 import { handleSchema, openapiTypeFormat } from '.';
-export default (isRoot: boolean) => {
+const path = (name: string, schema: OA3.SchemaObject) => {
+  console.log(schema);
+  return `export interface ${name}\n {
+  
+  }`;
+};
+const schema = (isRoot: boolean) => {
   const ref = (key: string, name: string, depth: number) => {
     return isRoot ? `export type ${key} = ${name}\n` : `${'  '.repeat(depth)}${key}: ${name}\n`;
   };
@@ -32,4 +38,8 @@ export default (isRoot: boolean) => {
     baseObject,
     complexObject,
   };
+};
+export default {
+  path,
+  schema,
 };
