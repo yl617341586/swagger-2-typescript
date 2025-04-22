@@ -44,9 +44,8 @@ export default (data: OA3.Document | string): string => {
       }
       if (isRef) exportTypes.push(ref(key, refName, depth));
       else {
-        if (hasAllOf) {
-          console.log(key, schema);
-        } else exportTypes.push(generateFn(key, <OA3.SchemaObject>schema, depth));
+        if (hasAllOf) exportTypes.push(allOf(key, (<OA3.SchemaObject>schema).allOf ?? [], depth));
+        else exportTypes.push(generateFn(key, <OA3.SchemaObject>schema, depth));
       }
       if (!schemaStack.length) exportTypes.push('}\n'.repeat(lastDepth));
     }

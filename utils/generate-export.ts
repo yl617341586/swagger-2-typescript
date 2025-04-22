@@ -5,13 +5,16 @@
  * @description: generate export string
  */
 import { OpenAPIV3 as OA3 } from 'openapi-types';
-import { openapiTypeFormat } from '.';
+import { handleSchema, openapiTypeFormat } from '.';
 export default (isRoot: boolean) => {
   const ref = (key: string, name: string, depth: number) => {
-    return isRoot ? `export type ${key} = ${name};\n` : `${'  '.repeat(depth)}${key}: ${name}\n`;
+    return isRoot ? `export type ${key} = ${name}\n` : `${'  '.repeat(depth)}${key}: ${name}\n`;
   };
-  const allOf = (key: string, schema: OA3.ReferenceObject | OA3.SchemaObject) => {
-    return `export interface ${key} extends ${schema} {};\n`;
+  const allOf = (key: string, allOf: (OA3.SchemaObject | OA3.ReferenceObject)[], depth: number) => {
+    const names = allOf.map(_schema => handleSchema(_schema).refName);
+    return isRoot
+      ? `export interface ${key} extends ${String(names)}\n`
+      : `${'  '.repeat(depth)}${key}: ${names.concat(['']).join(' & ')}`;
   };
   const baseObject = (key: string, schema: OA3.SchemaObject, depth: number) => {
     return isRoot
