@@ -36,14 +36,20 @@ const schema = (isRoot: boolean) => {
 };
 const comment = (schema: OA3.SchemaObject): string => {
   const comments: string[] = [];
-  const allowList: (keyof OA3.SchemaObject)[] = ['description', 'format', 'maxLength', 'minLength'];
+  const allowList: (keyof OA3.SchemaObject)[] = [
+    'description',
+    'format',
+    'maxLength',
+    'minLength',
+    'example',
+  ];
   allowList.forEach(key => {
     if (key in schema) {
-      const _key = `@${key}`.replaceAll('@description', '');
-      comments.push(`${_key} ${schema[key]} `);
+      const _key = `@${key} `.replaceAll('@description ', '');
+      comments.push(`${_key}${schema[key]} `);
     }
   });
-  return comments.length ? `/**${comments.join('')}*/\n` : '';
+  return comments.length ? `/** ${comments.join('')}*/\n` : '';
 };
 export default {
   schema,

@@ -8,8 +8,9 @@ export default (schema: OA3.SchemaObject): string => {
       return 'number';
     case 'boolean':
       return 'boolean';
-    case 'string':
-      return 'string';
+    case 'string': {
+      return schema.enum ? `'${schema.enum.join(`' | '`)}'` : 'string';
+    }
     case 'array': {
       const _schema = <OA3.ArraySchemaObject>schema;
       const { isRef, refName } = handleSchema(_schema.items);
