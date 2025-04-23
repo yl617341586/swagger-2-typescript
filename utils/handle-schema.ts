@@ -15,6 +15,10 @@ export default (schema: OA3.SchemaObject | OA3.ReferenceObject) => {
   };
   const hasAllOf = Object.prototype.hasOwnProperty.call(schema, 'allOf');
   const isArray = Object.prototype.hasOwnProperty.call(schema, 'items');
+  const hasAdditionalProperties = Object.prototype.hasOwnProperty.call(
+    schema,
+    'additionalProperties',
+  );
 
   return {
     isRef,
@@ -22,5 +26,6 @@ export default (schema: OA3.SchemaObject | OA3.ReferenceObject) => {
     refName,
     comment: isRef ? '' : generateComment(<OA3.SchemaObject>schema),
     hasAllOf,
+    hasAdditionalProperties,
   };
 };

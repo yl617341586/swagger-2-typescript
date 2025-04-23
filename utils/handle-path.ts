@@ -20,64 +20,70 @@ const methodsMaptoProperty = (method: OA3.HttpMethods) => {
       return 'parameters';
   }
 };
-const upperCaseFirstLetter = (str: string) => str.replace(/^\w/, c => c.toUpperCase());
-const deleteFirstSlash = (str: string) => str.slice(1);
-const handleContent = (content: { [media: string]: OA3.MediaTypeObject }) => {
-  const { isRef } = handleSchema(content['application/json']?.schema ?? {});
-  return {
-    isRef,
-  };
-};
+const upperCaseLetter = (str: string) => str.replace(/\/\w/g, c => c[1].toUpperCase());
+const handleCurlyBraces = (str: string) =>
+  str.replace(
+    /\{([^}]+)\}/g,
+    (_, capture) => `by${capture.charAt(0).toUpperCase()}${capture.slice(1)}`,
+  );
+
 export default (key: string, path: OA3.PathItemObject) => {
   const pathMap = new Map<string, { [key: string]: OA3.SchemaObject }>();
   Object.entries(path).forEach(([_key, value]) => {
     const requsetProprety = methodsMaptoProperty(<OA3.HttpMethods>_key);
-    let mapName = '';
-    if (requsetProprety) {
-      const _value = <OA3.OperationObject>value;
-      mapName = requsetProprety.replace(/^\w/, c => c.toUpperCase());
-      if (requsetProprety in _value) {
-        const schemas: { [key: string]: OA3.SchemaObject } = {};
-        if ('parameters' in _value) {
-          const properties: OA3.SchemaObject['properties'] = {};
-          (<OA3.ParameterObject[]>_value['parameters'])?.forEach(
-            ({ name, schema, description, required }) =>
-              Object.assign(properties, { [name]: { ...schema, description, required } }, {}),
-          );
-          Object.assign(schemas, { properties });
-          pathMap.set(
-            `${upperCaseFirstLetter(_key)}${upperCaseFirstLetter(deleteFirstSlash(key))}${mapName}`,
-            schemas,
-          );
-        } else if ('requestBody' in _value) {
-          const { content } = <OA3.RequestBodyObject>_value['requestBody'];
-          const { isRef } = handleContent(content);
-          if (!isRef)
+    if (!requsetProprety) return;
+    const _value = <OA3.OperationObject>value;
+    const mapName = requsetProprety.replace(/^\w/, c => c.toUpperCase());
+    if ('requestBody' in _value) {
+      const schemas: { [key: string]: OA3.SchemaObject } = {};
+      const { content } = <OA3.RequestBodyObject>_value['requestBody'];
+      const { isRef, isArray } = handleSchema(content?.['application/json']?.schema ?? {});
+      if (!isRef && content && !isArray)
+        pathMap.set(
+          `${upperCaseLetter(_key)}${upperCaseLetter(handleCurlyBraces(key))}${mapName}`,
+          schemas,
+        );
+    }
+    if ('parameters' in _value && _value['parameters']?.length) {
+      const schemas: { [key: string]: OA3.SchemaObject } = {};
+      const properties: OA3.SchemaObject['properties'] = {};
+      (<OA3.ParameterObject[]>_value['parameters'])?.forEach(
+        ({ name, schema, description, required }) =>
+          Object.assign(properties, { [name]: { ...schema, description, required } }, {}),
+      );
+      Object.assign(schemas, { properties });
+      pathMap.set(
+        `${upperCaseLetter(_key)}${upperCaseLetter(handleCurlyBraces(key))}${mapName}`,
+        schemas,
+      );
+    }
+    if ('responses' in _value) {
+      const schemas: { [key: string]: OA3.SchemaObject } = {};
+      Object.entries(_value['responses']).forEach(([code, response]) => {
+        const { content } = <OA3.ResponseObject>response;
+        const schema = content?.['application/json']?.schema ?? {};
+        const { isRef, isArray, hasAdditionalProperties } = handleSchema(schema);
+        if (
+          !isRef &&
+          content &&
+          !isArray &&
+          !hasAdditionalProperties &&
+          (<OA3.SchemaObject>schema).type === 'object'
+        ) {
+          Object.assign(schemas, content?.['application/json']?.schema);
+          if (new RegExp(/^[2]\d{2}$/).test(code)) {
             pathMap.set(
-              `${upperCaseFirstLetter(_key)}${upperCaseFirstLetter(deleteFirstSlash(key))}${mapName}`,
+              `${upperCaseLetter(_key)}${upperCaseLetter(handleCurlyBraces(key))}Responses`,
               schemas,
             );
-        }
-      }
-      if ('responses' in _value) {
-        Object.entries(_value['responses']).forEach(([code, response]) => {
-          const { content } = <OA3.ResponseObject>response;
-          const { isRef } = handleContent(content ?? {});
-          if (!isRef) {
-            if (new RegExp(/^[2]\d{2}$/).test(code)) {
-              pathMap.set(
-                `${upperCaseFirstLetter(_key)}${upperCaseFirstLetter(deleteFirstSlash(key))}Responses`,
-                {},
-              );
-            } else if (new RegExp(/^[4]\d{2}$/).test(code)) {
-              pathMap.set(
-                `${upperCaseFirstLetter(_key)}${upperCaseFirstLetter(deleteFirstSlash(key))}ResponsesError`,
-                {},
-              );
-            }
+          } else if (new RegExp(/^[4]\d{2}$/).test(code)) {
+            pathMap.set(
+              `${upperCaseLetter(_key)}${upperCaseLetter(handleCurlyBraces(key))}ResponsesError`,
+              schemas,
+            );
           }
-        });
-      }
+        }
+      });
     }
   });
   return pathMap;
