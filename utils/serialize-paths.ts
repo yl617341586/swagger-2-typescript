@@ -1,5 +1,5 @@
 import { OpenAPIV3 as OA3 } from 'openapi-types';
-import { handlePath } from '.';
+import handlePath from './handle-path';
 export default (paths: OA3.PathsObject) => {
   const schemas: OA3.ComponentsObject['schemas'] = {};
   Object.entries(paths).forEach(([key, value]) => {
