@@ -39,10 +39,12 @@ export default (key: string, path: OA3.PathItemObject) => {
       if (requsetProprety in _value) {
         const schemas: { [key: string]: OA3.SchemaObject } = {};
         if ('parameters' in _value) {
+          const properties: OA3.SchemaObject['properties'] = {};
           (<OA3.ParameterObject[]>_value['parameters'])?.forEach(
             ({ name, schema, description, required }) =>
-              Object.assign(schemas, { [name]: { ...schema, description, required } }, {}),
+              Object.assign(properties, { [name]: { ...schema, description, required } }, {}),
           );
+          Object.assign(schemas, { properties });
           pathMap.set(
             `${upperCaseFirstLetter(_key)}${upperCaseFirstLetter(deleteFirstSlash(key))}${mapName}`,
             schemas,
@@ -50,7 +52,7 @@ export default (key: string, path: OA3.PathItemObject) => {
         } else if ('requestBody' in _value) {
           const { content } = <OA3.RequestBodyObject>_value['requestBody'];
           const { isRef } = handleContent(content);
-          if (isRef)
+          if (!isRef)
             pathMap.set(
               `${upperCaseFirstLetter(_key)}${upperCaseFirstLetter(deleteFirstSlash(key))}${mapName}`,
               schemas,
@@ -61,7 +63,7 @@ export default (key: string, path: OA3.PathItemObject) => {
         Object.entries(_value['responses']).forEach(([code, response]) => {
           const { content } = <OA3.ResponseObject>response;
           const { isRef } = handleContent(content ?? {});
-          if (isRef) {
+          if (!isRef) {
             if (new RegExp(/^[2]\d{2}$/).test(code)) {
               pathMap.set(
                 `${upperCaseFirstLetter(_key)}${upperCaseFirstLetter(deleteFirstSlash(key))}Responses`,
