@@ -40,6 +40,7 @@ const exportSchemas = (schemas: OA3.ComponentsObject['schemas']) => {
     }
     if (isRef) exportSchemaTypes.push(ref(key, refName, depth));
     else {
+      exportSchemaTypes.push(generateExport.comment(<OA3.SchemaObject>schema));
       if (hasAllOf)
         exportSchemaTypes.push(allOf(key, (<OA3.SchemaObject>schema).allOf ?? [], depth));
       else exportSchemaTypes.push(generateFn(key, <OA3.SchemaObject>schema, depth));

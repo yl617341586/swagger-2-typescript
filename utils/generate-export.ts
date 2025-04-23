@@ -6,12 +6,7 @@
  */
 import { OpenAPIV3 as OA3 } from 'openapi-types';
 import { handleSchema, openapiTypeFormat } from '.';
-const path = (name: string, schema: OA3.SchemaObject) => {
-  console.log(schema);
-  return `export interface ${name}\n {
-  
-  }`;
-};
+
 const schema = (isRoot: boolean) => {
   const ref = (key: string, name: string, depth: number) => {
     return isRoot ? `export type ${key} = ${name}\n` : `${'  '.repeat(depth)}${key}: ${name}\n`;
@@ -39,7 +34,18 @@ const schema = (isRoot: boolean) => {
     complexObject,
   };
 };
+const comment = (schema: OA3.SchemaObject): string => {
+  const comments: string[] = [];
+  const allowList: (keyof OA3.SchemaObject)[] = ['description', 'format', 'maxLength', 'minLength'];
+  allowList.forEach(key => {
+    if (key in schema) {
+      const _key = `@${key}`.replaceAll('@description', '');
+      comments.push(`${_key} ${schema[key]} `);
+    }
+  });
+  return comments.length ? `/**${comments.join('')}*/\n` : '';
+};
 export default {
-  path,
   schema,
+  comment,
 };
