@@ -5,13 +5,5 @@
   "trailingComma": "all", 
   "proseWrap": "never",
   "arrowParens": "avoid",
-  "htmlWhitespaceSensitivity": "ignore",
-  "overrides": [
-    {
-      "files": ".prettierrc",
-      "options": {
-        "parser": "json"
-      }
-    }
-  ]
+  "htmlWhitespaceSensitivity": "ignore"
 }

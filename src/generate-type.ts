@@ -1,41 +1,69 @@
-import { openapiVersionCheck, handleRef, handleSchema } from '../utils';
-import { OpenApi, Reference, Schema } from '../openapi';
+import { OpenAPIV3 as OA3 } from 'openapi-types';
+import {
+  openapiVersionValidate,
+  generateExport,
+  handleSchema,
+  openapiOriginDataFormat,
+  serializePaths,
+} from '../utils';
 
-export default async (json: OpenApi): Promise<string> => {
-  let exportTypes = '';
-  try {
-    const { objectAssign, compositeType, handleSchemaObject } = handleSchema();
-    const { isAllOf } = compositeType();
-    // 检查openapi版本
-    openapiVersionCheck(json.openapi);
+const exportSchemas = (schemas: OA3.ComponentsObject['schemas']) => {
+  const exportSchemaTypes: string[] = [];
 
-    // 获取需要导出的类型
-    Object.entries(json.components?.schemas ?? {}).forEach(([key, item]) => {
-      const DFSStack = [];
-      const typeQueue = [];
-      exportTypes += `export interface ${key} {\n`;
-      DFSStack.unshift(item);
-      while (DFSStack.length) {
-        const top = DFSStack.shift() as Schema | Reference;
-        const { name } = handleRef(top);
-
-        if (name) DFSStack.unshift(json.components?.schemas?.[name]);
-        if (isAllOf(top as Schema)) {
-          for (let index = (top as Schema).allOf?.length ?? 0; index > 0; index--) {
-            const item = (top as Schema).allOf?.[index - 1] as Schema | Reference;
-            const { name } = handleRef(item);
-            if (name) DFSStack.unshift(json.components?.schemas?.[name]);
-            if (!name) DFSStack.unshift(item);
-          }
-        }
-        if (!name && !isAllOf(top as Schema)) typeQueue.push(top);
+  if (!schemas) return exportSchemaTypes.join('');
+  let lastDepth = 0;
+  const rootNames: string[] = [];
+  const schemaStack: [boolean, string, OA3.ReferenceObject | OA3.SchemaObject, number][] = [];
+  const matchCurlyBraces = (depth: number) => {
+    if (lastDepth < depth) exportSchemaTypes.push('{\n');
+    if (lastDepth > depth && depth) exportSchemaTypes.push('}\n');
+    if (!depth && lastDepth) exportSchemaTypes.push('}\n'.repeat(lastDepth));
+    lastDepth = depth;
+  };
+  Object.entries(schemas).forEach(entry => {
+    rootNames.push(entry[0]);
+    schemaStack.push([true, ...entry, 0]);
+  });
+  while (schemaStack.length) {
+    const [isRoot, key, schema, depth] = schemaStack.shift()!;
+    const { isRef, refName, hasAllOf, isArray } = handleSchema(schema);
+    const { ref, allOf, baseObject, complexObject } = generateExport.schema(isRoot);
+    const properties = (<OA3.SchemaObject>schema).properties;
+    const generateFn = isArray ? complexObject : baseObject;
+    matchCurlyBraces(depth);
+    if (properties) {
+      const arr = Object.entries(properties);
+      for (let i = arr.length - 1; i >= 0; i--) {
+        const [_key, property] = arr[i];
+        schemaStack.unshift([false, _key, property, depth + 1]);
       }
-      exportTypes += handleSchemaObject(objectAssign(...(typeQueue as Array<Schema>)));
+    }
+    if (isRef) exportSchemaTypes.push(ref(key, refName, depth));
+    else {
+      exportSchemaTypes.push(generateExport.comment(<OA3.SchemaObject>schema));
+      if (hasAllOf)
+        exportSchemaTypes.push(allOf(key, (<OA3.SchemaObject>schema).allOf ?? [], depth));
+      else exportSchemaTypes.push(generateFn(key, <OA3.SchemaObject>schema, depth));
+    }
+    if (!schemaStack.length) exportSchemaTypes.push('}\n'.repeat(lastDepth));
+  }
+  return exportSchemaTypes.join('');
+};
 
-      exportTypes += `}\n`;
-    });
-  } catch (e: any) {
+export default (data: OA3.Document | string): string => {
+  const exportTypes: string[] = [];
+
+  try {
+    // format the incoming parameters to JSON object
+    const openapiData = openapiOriginDataFormat(data);
+    // validate the openapi JSON version
+    openapiVersionValidate(openapiData.openapi);
+
+    const pathsTypes = exportSchemas(serializePaths(openapiData.paths));
+    const schemasTypes = exportSchemas(openapiData.components?.schemas);
+    exportTypes.push(...[pathsTypes, schemasTypes]);
+  } catch (e: unknown) {
     console.error(`[Swagger2TSFile]: ${e}`);
   }
-  return exportTypes;
+  return exportTypes.join('');
 };

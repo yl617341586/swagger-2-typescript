@@ -1,6 +1,8 @@
-import { Reference, Schema } from '../openapi';
-export default (schema: Schema | Reference) => {
+import { OpenAPIV3 as OA3 } from 'openapi-types';
+
+export default (schema: OA3.SchemaObject | OA3.ReferenceObject) => {
   const isRef = Object.prototype.hasOwnProperty.call(schema, '$ref');
-  const name = isRef ? (schema as Reference)?.$ref.replace('#/components/schemas/', '') : null;
-  return { name };
+  const regex = /[^/]+$/;
+  const name = isRef ? ((<OA3.ReferenceObject>schema).$ref.match(regex)?.[0] ?? '') : '';
+  return { isRef, name };
 };
