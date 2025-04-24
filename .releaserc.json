@@ -9,7 +9,7 @@
       {
         "assets": ["package.json", "CHANGELOG.md"],
         "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}",
-        "pushOptions": ["--no-verify"]
+        "pushOptions": ["--force-with-lease"]
       }
     ],
     "@semantic-release/github"
