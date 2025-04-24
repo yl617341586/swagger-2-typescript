@@ -2,19 +2,19 @@ import { writeFileSync, constants, accessSync, mkdirSync } from 'fs';
 import { cwd } from 'process';
 import { resolve, dirname } from 'path';
 import generateType from './generate-type';
-import { OpenAPIV3 } from 'openapi-types';
-export default async (json: OpenAPIV3.Document, output = resolve(cwd(), 'type.ts')) => {
+import { OpenAPIV3 as OA3 } from 'openapi-types';
+export default async (data: OA3.Document | string, output = resolve(cwd(), 'type.d.ts')) => {
   const path = dirname(output);
-  const data = await generateType(json);
+  const exportData = generateType(data);
   const write = () => {
-    writeFileSync(output, data, { encoding: 'utf-8' });
+    writeFileSync(output, exportData, { encoding: 'utf-8' });
     console.log(`[Swagger2TSFile]: 文件生成路路径 ${output}`);
   };
   try {
     accessSync(path, constants.F_OK);
   } catch (e: unknown) {
     if (e instanceof Error) {
-      const error = e as NodeJS.ErrnoException;
+      const error = <NodeJS.ErrnoException>e;
       if (error.code === 'ENOENT') mkdirSync(path, { recursive: true });
       else return console.error(`[Swagger2TSFile]: ${error}`);
     }
@@ -24,8 +24,8 @@ export default async (json: OpenAPIV3.Document, output = resolve(cwd(), 'type.ts
     write();
   } catch (e: unknown) {
     if (e instanceof Error) {
-      const error = e as NodeJS.ErrnoException;
-      if (error.code === 'ENOENT') write();
+      const error = <NodeJS.ErrnoException>e;
+      if (error.code === 'ENOENT') return write();
       else return console.error(`[Swagger2TSFile]: ${error}`);
     }
   }
