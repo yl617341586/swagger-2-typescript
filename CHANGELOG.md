@@ -1,3 +1,10 @@
+## [3.1.2](https://github.com/yl617341586/swagger-2-typescript/compare/v3.1.1...v3.1.2) (2025-04-27)
+
+
+### Bug Fixes
+
+* 🐛 openapi-types ([2a4b923](https://github.com/yl617341586/swagger-2-typescript/commit/2a4b9237f72300b7e621c449548598bc73fce8d3))
+
 ## [3.1.1](https://github.com/yl617341586/swagger-2-typescript/compare/v3.1.0...v3.1.1) (2025-04-27)
 
 

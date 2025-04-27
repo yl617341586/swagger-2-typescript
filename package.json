@@ -1,6 +1,6 @@
 {
   "name": "swagger-2-ts-file",
-  "version": "3.1.1",
+  "version": "3.1.2",
   "description": "swagger json to ts file",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
