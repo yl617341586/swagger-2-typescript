@@ -13,6 +13,13 @@ const config = [
     ignores: ['lib/**', 'node_modules/**'],
   },
   {
+    settings: {
+      'import/resolver': {
+        typescript: {
+          project: './tsconfig.json',
+        },
+      },
+    },
     rules: {},
   },
   js.configs.recommended,
